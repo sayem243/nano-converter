@@ -43,16 +43,16 @@
           <div class="box">
             <div class="input-group">
               <label>Enter your text below</label>
-              <textarea name="text-field" cols="40" rows="10"> </textarea>
+              <textarea name="text-field" cols="40" rows="10" v-model="line.text"> </textarea>
             </div>
             <div class="half-rem-space"></div>
 
             <div class="input-group">
               <label>Enter your Binary  below</label>
-              <textarea name="binary-field" cols="40" rows="10"> </textarea>
+              <textarea name="binary-field" cols="40" rows="10" v-model="line.binary"> </textarea>
             </div>
             <div class="reset-btn-container">
-              <button>Button</button>
+              <button v-on:click="resetLine">Reset</button>
             </div>
             <div class="one-rem-space"></div>
           </div>
@@ -96,12 +96,37 @@ function  ishexa(text){
   return true;
 }
 
+function TextToBinary(text){
+ const charCodeArray=[]
+  for(let i in text){
+    charCodeArray.push(text.charCodeAt(i));
+  }
+  const binaryArray=charCodeArray.map((char)=>{
+    return char.toString(2);
+  });
+  return binaryArray;
+
+}
+
+function BinaryToText(codeArray){
+let text = '';
+for(let i of codeArray){
+  const char= String.fromCharCode(parseInt(i,2))
+  text=text.concat(char);
+}
+return text;
+}
+
 export default {
 
   name: 'App',
   // components: {
   //    HelloWorld
   // }
+
+  created() {
+    document.title="Number Conversation"
+  },
   data(){
     return  {
       number:{
@@ -110,7 +135,12 @@ export default {
         hexa:0,
         octal:0
       },
-      invalidNumber:false
+      line:{
+        text:'',
+        binary:''
+      },
+      invalidNumber:false,
+      invalidLine:false
     }
   },
   methods:{
@@ -122,6 +152,13 @@ export default {
         octal:0
       },
      this.invalidNumber=false
+    },
+    resetLine(){
+      this.line={
+        text:'',
+        binary:''
+      },
+      this.invalidLine=false;
     }
   },
 
@@ -171,6 +208,27 @@ export default {
       this.number.binary=decimal.toString(2) || 0;
       this.number.octal=decimal.toString(8);
       this.number.hexa=value || 0
+    },
+    'line.text':function (value){
+      if(value.length==0){
+        this.line.binary=''
+      }
+      else {
+        const codeArray=TextToBinary(value)
+          this.line.binary=codeArray.join(' ')
+
+      }
+    },
+    'line.binary':function (value){
+      if (value.length==0){
+        this.line.text='';
+      }
+      else {
+        const codearray =value.split(' ');
+        const text=BinaryToText(codearray)
+        this.line.text=text;
+      }
+
     }
   }
 }
